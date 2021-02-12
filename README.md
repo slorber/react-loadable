@@ -1,5 +1,11 @@
 ![React Loadable](http://thejameskyle.com/img/react-loadable-header.png)
 
+**IMPORTANT**: this is a minimalistic fork to solve the `componentWillMount` warning for the [facebook/docusaurus](https://github.com/facebook/docusaurus) project. 
+
+We don't plan to maintain this problem, just get rid of the warning.
+
+----
+
 > A higher order component for loading components with dynamic imports.
 
 ## Install
