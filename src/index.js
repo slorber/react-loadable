@@ -1,6 +1,5 @@
 "use strict";
 const React = require("react");
-const PropTypes = require("prop-types");
 
 const ALL_INITIALIZERS = [];
 const READY_INITIALIZERS = [];
@@ -17,6 +16,8 @@ function isWebpackReady(getModuleIds) {
     );
   });
 }
+
+const LoadableCaptureContext = React.createContext(null);
 
 function load(loader) {
   let promise = loader();
@@ -148,11 +149,7 @@ function createLoadableComponent(loadFn, options) {
       };
     }
 
-    static contextTypes = {
-      loadable: PropTypes.shape({
-        report: PropTypes.func.isRequired
-      })
-    };
+    static contextType = LoadableCaptureContext;
 
     static preload() {
       return init();
@@ -167,9 +164,9 @@ function createLoadableComponent(loadFn, options) {
     }
 
     _loadModule() {
-      if (this.context.loadable && Array.isArray(opts.modules)) {
+      if (this.context && Array.isArray(opts.modules)) {
         opts.modules.forEach(moduleName => {
-          this.context.loadable.report(moduleName);
+          this.context.report(moduleName);
         });
       }
 
@@ -271,26 +268,12 @@ function LoadableMap(opts) {
 Loadable.Map = LoadableMap;
 
 class Capture extends React.Component {
-  static propTypes = {
-    report: PropTypes.func.isRequired
-  };
-
-  static childContextTypes = {
-    loadable: PropTypes.shape({
-      report: PropTypes.func.isRequired
-    }).isRequired
-  };
-
-  getChildContext() {
-    return {
-      loadable: {
-        report: this.props.report
-      }
-    };
-  }
-
   render() {
-    return React.Children.only(this.props.children);
+    return React.createElement(
+        LoadableCaptureContext.Provider,
+        {value: {report: this.props.report}},
+        React.Children.only(this.props.children)
+    );
   }
 }
 
